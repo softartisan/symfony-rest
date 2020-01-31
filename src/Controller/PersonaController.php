@@ -58,7 +58,7 @@ class PersonaController extends AbstractController
      * @param ValidatorInterface $validator
      * @return JsonResponse
      */
-    public function create(Request $request, ValidatorInterface $validator) : Response
+    public function create(Request $request, ValidatorInterface $validator, EntityManagerInterface $manager) : Response
     {
         $data = json_decode($request->getContent(), true);
         $request->request->replace(is_array($data) ? $data : array());
@@ -77,6 +77,8 @@ class PersonaController extends AbstractController
             }
             return $this->json($errorNormalizer);
         }
+        $manager->persist($persona);
+        $manager->flush();
         return $this->json($persona->toArray());
     }
 
@@ -109,8 +111,24 @@ class PersonaController extends AbstractController
                 array_push($errorNormalizer[$error->getPropertyPath()],$error->getMessage());
             }
             return $this->json($errorNormalizer);
-        }
 
+        }
+        $manager->persist($persona);
+        $manager->flush();
+        return $this->json($persona->toArray());
+    }
+
+    /**
+     * @Route("/persona/{id}", methods={"DELETE"})
+     */
+    public function delete(EntityManagerInterface $manager, int $id) : Response
+    {
+        $persona = $manager->find(Persona::class, $id);
+        if(is_null($persona)){
+            return $this->json(["error" => "This persona doesn't exists."], 400);
+        }
+        $manager->remove($persona);
+        $manager->flush();
         return $this->json($persona->toArray());
     }
 

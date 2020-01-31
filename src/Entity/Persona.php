@@ -108,7 +108,8 @@ class Persona
         return [
             "age" => $this->age,
             "email" => $this->email,
-            "name" => $this->name
+            "name" => $this->name,
+            "id" => $this->id
         ];
     }
 }
