@@ -6,17 +6,11 @@ namespace App\Controller;
 
 use App\Entity\Persona;
 use App\Repository\PersonaRepository;
-use App\Validators\Persona\CreatePersonaValidator;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectManager;
-use PhpParser\Node\Expr\Cast\Object_;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -34,7 +28,7 @@ class PersonaController extends AbstractController
      */
     public function readOne(EntityManagerInterface $manager, int $id)
     {
-        $persona = $manager->find(Persona::class, $id);
+        $persona = $manager->getRepository(Persona::class)->find(Persona::class, $id);
         return (is_null($persona))
             ? $this->json(["error" => "This persona doesn't exists."], 400)
             : $this->json($persona->toArray());
@@ -48,7 +42,7 @@ class PersonaController extends AbstractController
         $personas = $manager->getRepository(Persona::class)->findAll();
         $personasArray = array_map(function($persona) {
             return $persona->toArray();
-        },$personas);
+        }, $personas);
         return $this->json(["personas" => $personasArray]);
     }
 
